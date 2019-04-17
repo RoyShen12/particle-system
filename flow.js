@@ -168,17 +168,20 @@ function start(initFunc, renderFunc) {
    */
   const canvas = document.getElementById('canvas_elem')
   const ctx = canvas.getContext('2d')
+  window.__ctxMain = ctx
   /**
    * @type {HTMLCanvasElement}
    */
   const canvasBg = document.getElementById('canvas_bg')
   const ctxBg = canvasBg.getContext('2d')
+  window.__ctxBg = ctxBg
 
   /**
    * @type {HTMLCanvasElement}
    */
   const canvasTemp = document.getElementById('canvas_mouse_e')
   const ctxTp = canvasTemp.getContext('2d')
+  window.__ctxTp = ctxTp
 
   ctx.font = 'lighter 7px TimesNewRoman'
   ctxBg.font = 'lighter 7px TimesNewRoman'
@@ -220,7 +223,7 @@ function start(initFunc, renderFunc) {
     }
 
     if (window.__stable_render) loop()
-    else setInterval(loop, 0)
+    else window.__itv_st_us = setInterval(loop, 0)
   }
 
   window.__echart_inst = window.echarts.init(document.getElementById('fps_frame'), {}, { width: 500, height: 500 })
@@ -333,5 +336,16 @@ function __debug() {
 }
 
 function __destory() {
-  __ps.removeAll()
+  if (window.__fps_stt) switch_fps_statistic()
+  if (window.__itv_st_us) clearInterval(window.__itv_st_us)
+  if (window.__ps) {
+    __ps.removeAll()
+    __ps = null
+    delete window.__ps
+  }
+  extraTasksQueue.splice(0, extraTasksQueue.length - 1)
+  window.__ctxText.width = window.__ctxText.width
+  window.__ctxMain.width = window.__ctxMain.width
+  window.__ctxBg.width = window.__ctxBg.width
+  window.__ctxTp.width = window.__ctxTp.width
 }

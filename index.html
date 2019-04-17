@@ -40,6 +40,7 @@
     <canvas id="canvas_mouse_e" width="1400" height="920" style="z-index:0;"></canvas>
     <canvas id="canvas_elem" width="1400" height="920" style="z-index:2;"></canvas>
     <canvas id="canvas_bg" width="1400" height="920" style="z-index:1;"></canvas>
+    <canvas id="canvas_off_screen" width="1400" height="920" style="visibility:hidden;position: fixed;width:0;height:0;"></canvas>
 
     <div style="position: absolute;right: 10px;top: 10px;width:490px">
 
@@ -104,7 +105,8 @@
         <span style="margin: 0 10px 0 0;">DEBUG</span>
         <button onclick="__debug()">*debug</button>
         <button onclick="__destory()">*destory</button>
-        <button onclick="addMess(100)">*micro mess</button>
+        <!-- <button onclick="addMess(100)">*micro mess</button> -->
+        <button onclick="__destory();run(false)">*restart in single-thread mode</button>
       </div>
 
       <div id="fps_frame" class="row" style="margin: 10px 0 5px 8px;bottom: 0;right: 0;position: fixed;"></div>

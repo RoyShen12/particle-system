@@ -219,7 +219,7 @@ class ParticleSystem {
   }
 
   displayWorker() {
-    showHint(window.__ctxText, `worker: ${this.workers.length}`, new Vector2(240, 18), new Vector2(0, 18 - window.__fontsz), new Vector2(340, 22), '#606266')
+    showHint(window.__ctxText, `worker: ${this.workers.length}`, new Vector2(240, 18), new Vector2(238, 18 - window.__fontsz), new Vector2(340, 22), '#606266')
   }
 
   get threadsCount() {
@@ -263,7 +263,7 @@ class ParticleSystem {
   }
 
   get useMultiThread() {
-    return this.particles.length > this.threadsCount * 1
+    return this.particles.length > this.threadsCount * 1 && window.__multi_thread
   }
 
   /**
@@ -294,8 +294,9 @@ class ParticleSystem {
   }
 
   removeAll() {
-    // this.workers.forEach(w => w.worker.terminate())
-    this.particles = []
+    this.pauseSignal = true
+    this.workers.forEach(w => w.worker.terminate())
+    this.particles = this.particles.splice(0, this.particles.length - 1)
     this.pCount = 0
     this.clearCtx()
   }

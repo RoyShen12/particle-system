@@ -263,14 +263,7 @@ emscripten::val calculating_universal_gravitation(emscripten::val rec_arr) {
 	return send_array_fast_double(ret_f64_str.data(), 3 * my_load_length);
 }
 
-emscripten::val send_array_fast_uint32_test(uint32_t length, uint32_t fill) {
-	auto ret = std::vector<uint32_t>(length);
-	std::fill(ret.begin(), ret.end(), fill);
-	return send_array_fast_uint32(ret.data(), ret.size());
-}
-
 EMSCRIPTEN_BINDINGS(my_module) {
-	// function("_send_array_fast_uint32_test", &send_array_fast_uint32_test, emscripten::allow_raw_pointers());
-	function("_calculating_particle_devour", &calculating_particle_devour, emscripten::allow_raw_pointers());
-	function("_calculating_universal_gravitation", &calculating_universal_gravitation, emscripten::allow_raw_pointers());
+	emscripten::function("_calculating_particle_devour", &calculating_particle_devour, emscripten::allow_raw_pointers());
+	emscripten::function("_calculating_universal_gravitation", &calculating_universal_gravitation, emscripten::allow_raw_pointers());
 }
