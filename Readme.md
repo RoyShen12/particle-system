@@ -11,6 +11,9 @@
 ## browser
 + tested on Chrome 70+ (fastest), Firefox 65+ (will face some text blur questions) and Edge 18.  
 + Theoretically support for all modern web browsers.
+## web server
+Locally open index.html can not work because of the fetch API don't support `file://` URI and can't load .wasm file.  
+Pleace install and use a simple web server like serve (node.js) or SimpleHTTPServer (python).
 # building (if you want to modify the .cpp file your self)
 ## tools
 visiting [emscripten official website | installation](https://emscripten.org/docs/getting_started/downloads.html) and follow the instruction to get both the tools and environment ready.
