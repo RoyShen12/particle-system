@@ -139,6 +139,8 @@ class ParticleSystem {
 
     this.inner_p_count = 0
 
+    this.pCount = 0
+
     this.lastRenderTime = new Float64Array(1024)
 
     this.inner_render_interval = 0

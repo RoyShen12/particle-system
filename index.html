@@ -43,15 +43,27 @@
 
     <div style="position: absolute;right: 10px;top: 10px;width:490px">
 
-      <div class="row" style="margin: 0 0 10px 8px;">
-        <span style="margin: 0 0 0 0;font-size:12px;">Numerical Integration Accuracy: </span><div id="sim_speed" style="width:60px;display:inline-block;"></div>
-        <span style="margin: 0 0 0 10px;font-size:12px;">accuracy</span>
-        <input id="dot_rang" style="margin: 0 0 0 10px;width:60px;" type="range" min="0.000" max="0.100" step="0.0001" value="0.01" onchange="setGlobalDifferentialOfTime(+this.value)">
-        <span style="margin: 0 0 0 10px;font-size:12px;">haste</span>
+      <div class="row" style="margin: 0 0 10px 8px;text-align: center;">
+        <span style="margin: 0 0 0 0;font-size:16px;">Particle System</span>
+      </div>
+
+      <div class="row" style="margin: 0 0 0 8px;">
+        <span style="margin: 0 0 0 0;font-size:14px;">left click and press to generator a particle, drag to set initial speed.</span>
+      </div>
+
+      <div class="row" style="margin: 0 0 30px 8px;">
+        <span style="margin: 0 0 0 0;font-size:14px;">click an existing particle to monitor it.</span>
       </div>
 
       <div class="row" style="margin: 0 0 10px 8px;">
-        <span style="margin: 0 10px 0 0;font-size:12px;">Manual Adjunction Mass: </span><input type="number" id="mass_value" value="1000" style="width:90px;">
+        <span style="margin: 0 0 0 0;font-size:12px;">Numerical Integration Accuracy: </span><div id="sim_speed" style="width:60px;display:inline-block;"></div>
+        <span style="margin: 0 0 0 10px;font-size:12px;">accurate</span>
+        <input id="dot_rang" style="margin: 0 0 0 10px;width:60px;" type="range" min="0.000" max="0.100" step="0.0001" value="0.01" onchange="setGlobalDifferentialOfTime(+this.value)">
+        <span style="margin: 0 0 0 10px;font-size:12px;">hasty</span>
+      </div>
+
+      <div class="row" style="margin: 0 0 10px 8px;">
+        <span style="margin: 0 10px 0 0;font-size:12px;">Manual Particle Mass: </span><input type="number" id="mass_value" value="1000" style="width:90px;">
       </div>
 
       <div class="row" style="margin: 0 0 10px 8px;">
@@ -73,7 +85,8 @@
         <button onclick="addMess(1000)">little Primitive star disk</button>
       </div>
       <div class="row" style="margin: 0 0 5px 8px;">
-        <button onclick="addRandom(4000)">4k random</button>
+        <button onclick="addRandom(4000)">add 4k random</button>
+        <button onclick="addRandom(10000)">add 10k random</button>
       </div>
       <div class="row" style="margin: 0 0 5px 8px;">
         <button onclick="showButtonHandler('__sv', this, 'hide V→', 'show V→')">show V→</button>
@@ -84,7 +97,7 @@
       <div class="row" style="margin: 0 0 5px 8px;">
         <button onclick="showButtonHandler('__sv_log', this, 'disable log V', 'log V')">log V</button>
         <button onclick="showButtonHandler('__sac_log', this, 'disable log A', 'log A')">log A</button>
-        <span style="margin: 0 0 0 10px;color: rgb(226, 11, 11);font-size:12px;">will be very slow !</span>
+        <span style="margin: 0 0 0 10px;color: rgb(226, 11, 11);font-size:12px;">open log will be very slow !</span>
       </div>
 
       <div class="row" style="margin: 10px 0 5px 8px;">

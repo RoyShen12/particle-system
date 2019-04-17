@@ -7,6 +7,7 @@
 + Wasm module is written in pure modern C++.
 + For getting the best performance, the data transporting from C++ module to Javascript is passed by raw-memory-view, which is hundreds of time faster than passing an emscripten::val::array.
 + data transportation from Javascript to C++ module also used raw-heap-memory-view and inevitable raw pointer opration for best performance.
++ changing the `<body onload="run(true)">` to `<body onload="run(false)">` to see how it works without Web Worker & Web Assembly.
 # running requirements
 ## browser
 + tested on Chrome 70+ (fastest), Firefox 65+ (will face some text blur questions) and Edge 18.  

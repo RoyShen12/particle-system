@@ -45,6 +45,7 @@ struct Particle {
 	};
 
 	inline double RocheLimitPow2(Particle p_other) const {
+		// 流体的洛希极限
 		return pow((radius + p_other.radius) * 2.423, 2.0);
 	}
 
@@ -103,6 +104,8 @@ int main(int argc, char **argv) {
 	return 0;
 }
 
+// 最快接受JS TypedArray的方式
+// unique_ptr必须move
 std::tuple<std::unique_ptr<double[]>, uint32_t> get_double_arr_from_js(emscripten::val arr) {
 	auto module = emscripten::val::global("Module");
 	const uint32_t _len = arr["length"].as<uint32_t>();
