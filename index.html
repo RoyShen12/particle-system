@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <style>
+      body {
+        -webkit-font-smoothing: antialiased;
+        -webkit-tap-highlight-color: transparent;
+        margin: 0;
+      }
+      .row {
+        position: relative;
+        box-sizing: border-box;
+        display: block;
+      }
+      canvas{
+        margin: 5px 0 0 10px;
+        position: absolute;
+        visibility: visible;
+        border: 1px solid rgba(144, 144, 144, .3);
+      }
+    </style>
+    <title>P S</title>
+    <!-- <script type="text/javascript" src="calculator.js"></script> -->
+    <script type="text/javascript" src="lodash.js"></script>
+    <script type="text/javascript" src="tools.js"></script>
+    <!-- <script type="text/javascript" src="Q-tree.js"></script> -->
+    <script type="text/javascript" src="vector.js"></script>
+    <script type="text/javascript" src="color.js"></script>
+    <script type="text/javascript" src="particle.js"></script>
+    <script type="text/javascript" src="flow.js"></script>
+    <script type="text/javascript" src="effectors.js"></script>
+    <script type="text/javascript" src="echarts.min.js"></script>
+  </head>
+  <body onload="run(true)">
+
+    <canvas id="canvas_text_hint" width="1400" height="920" style="z-index:-1;"></canvas>
+    <canvas id="canvas_mouse_e" width="1400" height="920" style="z-index:0;"></canvas>
+    <canvas id="canvas_elem" width="1400" height="920" style="z-index:2;"></canvas>
+    <canvas id="canvas_bg" width="1400" height="920" style="z-index:1;"></canvas>
+
+    <div style="position: absolute;right: 10px;top: 10px;width:490px">
+
+      <div class="row" style="margin: 0 0 10px 8px;">
+        <span style="margin: 0 0 0 0;font-size:12px;">Numerical Integration Accuracy: </span><div id="sim_speed" style="width:60px;display:inline-block;"></div>
+        <span style="margin: 0 0 0 10px;font-size:12px;">accuracy</span>
+        <input id="dot_rang" style="margin: 0 0 0 10px;width:60px;" type="range" min="0.000" max="0.100" step="0.0001" value="0.01" onchange="setGlobalDifferentialOfTime(+this.value)">
+        <span style="margin: 0 0 0 10px;font-size:12px;">haste</span>
+      </div>
+
+      <div class="row" style="margin: 0 0 10px 8px;">
+        <span style="margin: 0 10px 0 0;font-size:12px;">Manual Adjunction Mass: </span><input type="number" id="mass_value" value="1000" style="width:90px;">
+      </div>
+
+      <div class="row" style="margin: 0 0 10px 8px;">
+        <button id="pause_resume" onclick="pause_resume()">Pause&nbsp;&nbsp;</button>
+        <button id="stable_fast" onclick="stable_fast_mode()">Vertical Sync on</button>
+        <button id="show_hide_ftpstt" onclick="switch_fps_statistic()">Fps Statistic off</button>
+      </div>
+      <div class="row" style="margin: 0 0 0 8px;">
+        <span style="margin: 0 10px 0 0;font-size:12px;">multi-thread workers</span>
+        <button onclick="__ps.increaseWorker()">+</button>
+        <button onclick="__ps.decreaseWorker()">-</button>
+      </div>
+      <div class="row" style="margin: 0 0 10px 8px;">
+        <span style="margin: 0 10px 0 0;color: rgb(226, 11, 11);font-size:12px;">don not change amount of workers while multi-thread is on !</span>
+      </div>
+      <div class="row" style="margin: 0 0 5px 8px;">
+        <button onclick="addMess(10000)">huge Primitive star disk</button>
+        <button onclick="addMess(5000)">mid Primitive star disk</button>
+        <button onclick="addMess(1000)">little Primitive star disk</button>
+      </div>
+      <div class="row" style="margin: 0 0 5px 8px;">
+        <button onclick="addRandom(4000)">4k random</button>
+      </div>
+      <div class="row" style="margin: 0 0 5px 8px;">
+        <button onclick="showButtonHandler('__sv', this, 'hide V→', 'show V→')">show V→</button>
+        <button onclick="showButtonHandler('__sa', this, 'hide A→', 'show A→')">show A→</button>
+        <button onclick="showButtonHandler('__s_path', this, 'hide path', 'show path', _=>{__ps.contextBg.clearRect(0,0,...__ps.canvasWH)})">show path</button>
+        <button onclick="showButtonHandler('__sm', this, 'hide mass', 'show mass')">show mass</button>
+      </div>
+      <div class="row" style="margin: 0 0 5px 8px;">
+        <button onclick="showButtonHandler('__sv_log', this, 'disable log V', 'log V')">log V</button>
+        <button onclick="showButtonHandler('__sac_log', this, 'disable log A', 'log A')">log A</button>
+        <span style="margin: 0 0 0 10px;color: rgb(226, 11, 11);font-size:12px;">will be very slow !</span>
+      </div>
+
+      <div class="row" style="margin: 10px 0 5px 8px;">
+        <span style="margin: 0 10px 0 0;">DEBUG</span>
+        <button onclick="__debug()">*debug</button>
+        <button onclick="__destory()">*destory</button>
+        <button onclick="addMess(100)">*micro mess</button>
+      </div>
+
+      <div id="fps_frame" class="row" style="margin: 10px 0 5px 8px;bottom: 0;right: 0;position: fixed;"></div>
+
+    </div>
+  </body>
+</html>
