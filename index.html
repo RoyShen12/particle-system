@@ -71,6 +71,7 @@
         <button id="pause_resume" onclick="pause_resume()">Pause&nbsp;&nbsp;</button>
         <button id="stable_fast" onclick="stable_fast_mode()">Vertical Sync on</button>
         <button id="show_hide_ftpstt" onclick="switch_fps_statistic()">Fps Statistic off</button>
+        <button onclick="showButtonHandler('__multi_thread', this, 'disable Multi Thread', 'enable Multi Thread')">disable Multi Thread</button>
       </div>
       <div class="row" style="margin: 0 0 0 8px;">
         <span style="margin: 0 10px 0 0;font-size:12px;">multi-thread workers</span>
@@ -106,7 +107,7 @@
         <button onclick="__debug()">*debug</button>
         <button onclick="__destory()">*destory</button>
         <!-- <button onclick="addMess(100)">*micro mess</button> -->
-        <button onclick="__destory();run(false)">*restart in single-thread mode</button>
+        <!-- <button onclick="__destory();run(false)">*restart in single-thread mode</button> -->
       </div>
 
       <div id="fps_frame" class="row" style="margin: 10px 0 5px 8px;bottom: 0;right: 0;position: fixed;"></div>

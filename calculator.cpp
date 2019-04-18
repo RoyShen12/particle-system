@@ -7,6 +7,7 @@
 #include <utility>
 #include <algorithm>
 #include <tuple>
+#include <random>
 
 #include <cstdint>
 #include <cassert>
@@ -19,22 +20,38 @@
 
 constexpr double G = 6.67408e-3;
 
-constexpr bool __debug = false;
+// #define __debug_log;
+// #define __use_twice_ite
+
+double fast_invsqrt(double number) {
+	double y = number;
+	double x2 = y * 0.5;
+	int64_t i = *(int64_t *) & y;
+	i = 0x5fe6eb50c7b537a9 - (i >> 1);
+	y = *(double *) &i;
+	y = y * (1.5 - (x2 * y * y));   // 1st iteration
+	#ifdef __use_twice_ite
+	y = y * (1.5 - (x2 * y * y));   // 2nd iteration, this can be removed
+	#endif
+	return y;
+}
 
 struct Particle {
 
 	struct Vector2 {
 		inline static Vector2 unit(double x, double y) {
-			double dvd = sqrt(x * x + y * y);
-			return Vector2(x / dvd, y / dvd);
+			// double dvd = sqrt(x * x + y * y);
+			double dvd = fast_invsqrt(x * x + y * y);
+			return Vector2(x * dvd, y * dvd);
 		}
 		Vector2() : x(0), y(0) {}
 		Vector2(double x, double y) : x(x), y(y) {}
+
 		double x;
 		double y;
 
 		inline double distance_pow_2(Vector2 v_other) const {
-			return pow(x - v_other.x, 2.0) + pow(y - v_other.y, 2.0);
+			return (x - v_other.x) * (x - v_other.x) + (y - v_other.y) * (y - v_other.y);
 		}
 
 		inline Vector2 &multiply(double f) {
@@ -44,9 +61,9 @@ struct Particle {
 		}
 	};
 
-	inline double RocheLimitPow2(Particle p_other) const {
-		// 流体的洛希极限
-		return pow((radius + p_other.radius) * 2.423, 2.0);
+	inline double roche_limit_pow_2(Particle p_other) const {
+		// 流体的洛希极限: ((R1 + R2) * 2.423) * (density1 / density2) ^ (1/3)
+		return (radius + p_other.radius) * (radius + p_other.radius) * 5.870929;
 	}
 
 	Vector2 position;
@@ -105,7 +122,7 @@ int main(int argc, char **argv) {
 }
 
 // 最快接受JS TypedArray的方式
-// unique_ptr必须move
+// ** unique_ptr必须move
 std::tuple<std::unique_ptr<double[]>, uint32_t> get_double_arr_from_js(emscripten::val arr) {
 	auto module = emscripten::val::global("Module");
 	const uint32_t _len = arr["length"].as<uint32_t>();
@@ -115,7 +132,7 @@ std::tuple<std::unique_ptr<double[]>, uint32_t> get_double_arr_from_js(emscripte
 	return std::make_tuple(std::move(data), _len);
 }
 
-// 最快的递送数组方式
+// 最快的递送数组至JS的方式
 // 输出类型为对应的TypedArray，需要动态长度数组的不能用
 // ** 指针要在js操作完成后才能释放
 inline emscripten::val send_array_fast_double(double *arr, int len) {
@@ -127,7 +144,9 @@ inline emscripten::val send_array_fast_uint32(uint32_t *arr, int len) {
 }
 
 emscripten::val calculating_particle_devour(emscripten::val rec_arr) {
-	if (__debug) std::cout << "calculating_particle_devour enter." << std::endl;
+	#ifdef __debug_log
+	std::cout << "calculating_particle_devour enter." << std::endl;
+	#endif
 
 	auto arr_procd = get_double_arr_from_js(rec_arr);
 	auto _len = std::get<1>(arr_procd);
@@ -140,8 +159,7 @@ emscripten::val calculating_particle_devour(emscripten::val rec_arr) {
 	std::vector<Particle> particles;
 
 	for (uint32_t i = 3; i < _len - 8; i += 8) {
-		Particle p(data[i], data[i + 1], data[i + 2], data[i + 3], data[i + 4], data[i + 5], data[i + 6], data[i + 7]);
-		particles.emplace_back(p);
+		particles.emplace_back(Particle(data[i], data[i + 1], data[i + 2], data[i + 3], data[i + 4], data[i + 5], data[i + 6], data[i + 7]));
 	}
 
 	data.reset();
@@ -155,7 +173,9 @@ emscripten::val calculating_particle_devour(emscripten::val rec_arr) {
 
 	auto my_load = std::vector<Particle>(pieced_particles[my_index].first, pieced_particles[my_index].second);
 
-	if (__debug) std::cout << "cpp worker dv[" << my_index << "] total length: " << particles.size() << " load length: " << my_load.size() << std::endl;
+	#ifdef __debug_log
+	std::cout << "cpp worker dv[" << my_index << "] total length: " << particles.size() << " load length: " << my_load.size() << std::endl;
+	#endif
 
 	auto ret_uint32_vec = std::basic_string<uint32_t>(particles.size() * 2, 4294967295U);
 
@@ -174,7 +194,7 @@ emscripten::val calculating_particle_devour(emscripten::val rec_arr) {
 			if (index_in_all == (piece_max_length * my_index + index_in_my_load)) continue;
 
 			bool can_eat = (
-				p.position.distance_pow_2(p_other.position) <= p.RocheLimitPow2(p_other) &&
+				p.position.distance_pow_2(p_other.position) <= p.roche_limit_pow_2(p_other) &&
 				will_have_been_devoured.count(index_in_all) == 0
 			);
 
@@ -197,12 +217,17 @@ emscripten::val calculating_particle_devour(emscripten::val rec_arr) {
 
 	will_have_been_devoured.clear();
 
-	if (__debug) std::cout << "calculating_particle_devour will leave, set_index is " << set_index << " ." << std::endl;
+	#ifdef __debug_log
+	std::cout << "calculating_particle_devour will leave, set_index is " << set_index << " ." << std::endl;
+	#endif
+
 	return send_array_fast_uint32(ret_uint32_vec.data(), set_index + 1);
 }
 
 emscripten::val calculating_universal_gravitation(emscripten::val rec_arr) {
-	if (__debug) std::cout << "calculating_universal_gravitation enter." << std::endl;
+	#ifdef __debug_log
+	std::cout << "calculating_universal_gravitation enter." << std::endl;
+	#endif
 
 	auto arr_procd = get_double_arr_from_js(rec_arr);
 	auto _len = std::get<1>(arr_procd);
@@ -231,7 +256,9 @@ emscripten::val calculating_universal_gravitation(emscripten::val rec_arr) {
 	auto my_load = std::vector<Particle>(pieced_particles[my_index].first, pieced_particles[my_index].second);
 	uint32_t my_load_length = my_load.size();
 
-	if (__debug) std::cout << "cpp worker ug[" << my_index << "] total length: " << particles.size() << " load length: " << my_load_length << std::endl;
+	#ifdef __debug_log
+	std::cout << "cpp worker ug[" << my_index << "] total length: " << particles.size() << " load length: " << my_load_length << std::endl;
+	#endif
 
 	auto ret_f64_str = std::vector<double>(3 * my_load_length);
 
@@ -259,11 +286,25 @@ emscripten::val calculating_universal_gravitation(emscripten::val rec_arr) {
 
 	// std::cout << "before ret, my_load.size()" << my_load_length << std::endl;
 
-	if (__debug) std::cout << "calculating_universal_gravitation will leave." << std::endl;
+	#ifdef __debug_log
+	std::cout << "calculating_universal_gravitation will leave." << std::endl;
+	#endif
+
 	return send_array_fast_double(ret_f64_str.data(), 3 * my_load_length);
+}
+
+void test_fast_invsqrt(uint32_t loop_count) {
+	std::random_device RD;
+	std::mt19937_64 MT64(RD());
+	std::uniform_real_distribution<double> URDD{ 10.0, 10000.0 };
+	for (uint32_t i = 0; i < loop_count; i++) {
+		auto t = URDD(MT64);
+		std::cout << t << " 1/sys::sqrt " << 1.0 / sqrt(t) << " fast_invsqrt " << fast_invsqrt(t) << std::endl;
+	}
 }
 
 EMSCRIPTEN_BINDINGS(my_module) {
 	emscripten::function("_calculating_particle_devour", &calculating_particle_devour, emscripten::allow_raw_pointers());
 	emscripten::function("_calculating_universal_gravitation", &calculating_universal_gravitation, emscripten::allow_raw_pointers());
+	emscripten::function("_test_fast_invsqrt", &test_fast_invsqrt);
 }

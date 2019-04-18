@@ -141,7 +141,7 @@ class ParticleSystem {
 
     this.pCount = 0
 
-    this.lastRenderTime = new Float64Array(1024)
+    this.lastRenderTime = new Float64Array(8192)
 
     this.inner_render_interval = 0
 
@@ -162,8 +162,8 @@ class ParticleSystem {
     }
 
     this.MultiThreadStatusTextStyle = {
-      p: new Vector2(1202, 18),
-      lt: new Vector2(1200, 18 - window.__fontsz),
+      p: new Vector2(1162, 18),
+      lt: new Vector2(1160, 18 - window.__fontsz),
       rb: new Vector2(1320, 22)
     }
 
@@ -234,10 +234,10 @@ class ParticleSystem {
 
     // particle -> <px,py,vx,vy,ax,ay,m,r>
     const ret = new Float64Array(8 * this.particles.length + 3)
-    const t = []
-    this.particles.forEach(p => t.push(p.position.x, p.position.y, p.velocity.x, p.velocity.y, p.acceleration.x, p.acceleration.y, p.mass, p.radius))
-    ret.set([index, total, hint, ...t])
-
+    ret.set([index, total, hint])
+    // the fastest way I can think out to make particle linear
+    this.particles.forEach((p, i) => ret.set([p.position.x, p.position.y, p.velocity.x, p.velocity.y, p.acceleration.x, p.acceleration.y, p.mass, p.radius], i * 8 + 3))
+    
     //console.timeEnd('particlesToBinary')
     return ret
   }
@@ -263,7 +263,7 @@ class ParticleSystem {
   }
 
   get useMultiThread() {
-    return this.particles.length > this.threadsCount * 1 && window.__multi_thread
+    return window.__multi_thread && this.particles.length > this.threadsCount
   }
 
   /**
@@ -552,7 +552,7 @@ class ParticleSystem {
       this.renderInterval = (now - this.lastRenderTime[actualLength - 20]) / 20
     }
 
-    updateMtStatus(`multi-thread ${this.useMultiThread ? 'on' : 'off'}`, this.MultiThreadStatusTextStyle, this.useMultiThread ? '#67C23A' : '#E6A23C')
+    updateMtStatus(`compute on ${this.useMultiThread ? 'Worker' : 'Main'}`, this.MultiThreadStatusTextStyle, this.useMultiThread ? '#67C23A' : '#E6A23C')
   }
 
   checkAbnormal() {

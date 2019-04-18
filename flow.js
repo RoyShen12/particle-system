@@ -4,11 +4,12 @@ window.__width = 1400
 function run(multi_thread) {
   window.__multi_thread = multi_thread
   window.__worker_file_name = 'ps-worker.js'
+  console.log('document ', document.readyState)
   start(init, multi_thread ? globalRenderLoopAsync : globalRenderLoop)
 }
 
 /**
- * @type {(() => void)[]}
+ * @type {Function[]}
  */
 const extraTasksQueue = []
 /**
@@ -32,7 +33,7 @@ function init(canvas, ctx, ctxB, ctxT) {
   // debug pre-placed particle
   //ps.emit(new Particle(new Vector2(400, 400), new Vector2(0, 265), Color.random(), 1000, 'p1'))
   //ps.emit(new Particle(new Vector2(__width / 2, __height / 2), Vector2.zero, Color.random(), 1e7, 'giant', true))
-  // ps.emit(new Particle(new Vector2(__width / 2, __height / 2), Vector2.zero, Color.black, 1e8, 'black hole', true))
+  ps.emit(new Particle(new Vector2(__width / 2, __height / 2), Vector2.zero, Color.black, 1e7, 'black hole', true))
 
   // ps.emit(new Particle(new Vector2(500 - 200, 400 + 200), Vector2.zero, Color.random(), 10000000, 'gl', true))
   // ps.emit(new Particle(new Vector2(500 + 200, 400 + 200), Vector2.zero, Color.random(), 10000000, 'gr', true))
@@ -75,24 +76,22 @@ function init(canvas, ctx, ctxB, ctxT) {
         extraTasksQueue.splice(oldOneIndex, 1)
       }
 
-      extraTasksQueue.push(function () {
-        return function reportSelectedParticle() {
-          if (selectedP.dead) {
-            const info = `selected: target dead, lost track`
-            showHint(ctxText, info, SPTP.p, SPTP.lt, SPTP.rb, SPTP.s)
-            extraTasksQueue.splice(extraTasksQueue.findIndex(fx => fx.name === 'reportSelectedParticle'), 1)
-            return
-          }
-          const info = `selected: id:${selectedP.id}, mass:${US_Formatter.format(+selectedP.mass.toFixed(0))}, radius:${selectedP.radius.toFixed(2)}, V:<${selectedP.velocity.x.toFixed(1)},${selectedP.velocity.y.toFixed(1)}> [${selectedP.velocity.length().toFixed(1)}], a:<${selectedP.acceleration.x.toFixed(1)},${selectedP.acceleration.y.toFixed(1)}> [${selectedP.acceleration.length().toFixed(1)}]`
+      extraTasksQueue.push(function reportSelectedParticle() {
+        if (selectedP.dead) {
+          const info = `selected: target dead, lost track`
           showHint(ctxText, info, SPTP.p, SPTP.lt, SPTP.rb, SPTP.s)
+          extraTasksQueue.splice(extraTasksQueue.findIndex(fx => fx.name === 'reportSelectedParticle'), 1)
+          return
         }
-      }())
+        const info = `selected: id:${selectedP.id}, mass:${US_Formatter.format(+selectedP.mass.toFixed(0))}, radius:${selectedP.radius.toFixed(2)}, V:<${selectedP.velocity.x.toFixed(1)},${selectedP.velocity.y.toFixed(1)}> [${selectedP.velocity.length().toFixed(1)}], a:<${selectedP.acceleration.x.toFixed(1)},${selectedP.acceleration.y.toFixed(1)}> [${selectedP.acceleration.length().toFixed(1)}]`
+        showHint(ctxText, info, SPTP.p, SPTP.lt, SPTP.rb, SPTP.s)
+      })
     }
     else {
-      canvas.onmousemove = _.debounce(function (em) {
+      canvas.onmousemove = _.throttle(function (em) {
         ctxT.clearRect(0, 0, __width, __height)
         drawArrow(ctxT, new Vector2(e1.offsetX, e1.offsetY), new Vector2(em.offsetX, em.offsetY), 30, 10, 1, 'rgba(64,158,255,1)')
-      }, 1)
+      }, 17)
 
       canvas.onmouseup = function (e2) {
 
@@ -135,7 +134,7 @@ async function globalRenderLoopAsync(ps, dt) {
   // console.time('simulate-mt')
   await ps.simulateMultiThread(dt)
   // console.timeEnd('simulate-mt')
-  await sleep(1)
+  await sleep(0)
 
   ps.render()
 
@@ -189,7 +188,7 @@ function start(initFunc, renderFunc) {
   const ps = initFunc(canvas, ctx, ctxBg, ctxTp)
 
   // ps.effectors.push(new Gravity(new Vector2(0, 1e3)))
-  // ps.effectors.push(new ChamberBox())
+  ps.effectors.push(new ChamberBox())
   // ps.effectors.push(new BlackHoleEdge())
   // ps.effectors.push(new LoopWorld())
 
