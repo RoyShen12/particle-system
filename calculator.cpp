@@ -13,10 +13,10 @@
 #include <cassert>
 #include <cmath>
 
-#include <emscripten\emscripten.h>
-#include <emscripten\val.h>
-#include <emscripten\bind.h>
-#include <emscripten\wire.h>
+#include "emscripten.h"
+#include "val.h"
+#include "bind.h"
+#include "wire.h"
 
 constexpr double G = 6.67408e-3;
 
@@ -62,7 +62,7 @@ struct Particle {
 	};
 
 	inline double roche_limit_pow_2(Particle p_other) const {
-		// Á÷ÌåµÄÂåÏ£¼«ÏÞ: ((R1 + R2) * 2.423) * (density1 / density2) ^ (1/3)
+		// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï£ï¿½ï¿½ï¿½ï¿½: ((R1 + R2) * 2.423) * (density1 / density2) ^ (1/3)
 		return (radius + p_other.radius) * (radius + p_other.radius) * 5.870929;
 	}
 
@@ -121,8 +121,8 @@ int main(int argc, char **argv) {
 	return 0;
 }
 
-// ×î¿ì½ÓÊÜJS TypedArrayµÄ·½Ê½
-// ** unique_ptr±ØÐëmove
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½JS TypedArrayï¿½Ä·ï¿½Ê½
+// ** unique_ptrï¿½ï¿½ï¿½ï¿½move
 std::tuple<std::unique_ptr<double[]>, uint32_t> get_double_arr_from_js(emscripten::val arr) {
 	auto module = emscripten::val::global("Module");
 	const uint32_t _len = arr["length"].as<uint32_t>();
@@ -132,9 +132,9 @@ std::tuple<std::unique_ptr<double[]>, uint32_t> get_double_arr_from_js(emscripte
 	return std::make_tuple(std::move(data), _len);
 }
 
-// ×î¿ìµÄµÝËÍÊý×éÖÁJSµÄ·½Ê½
-// Êä³öÀàÐÍÎª¶ÔÓ¦µÄTypedArray£¬ÐèÒª¶¯Ì¬³¤¶ÈÊý×éµÄ²»ÄÜÓÃ
-// ** Ö¸ÕëÒªÔÚjs²Ù×÷Íê³Éºó²ÅÄÜÊÍ·Å
+// ï¿½ï¿½ï¿½Äµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½JSï¿½Ä·ï¿½Ê½
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½Ó¦ï¿½ï¿½TypedArrayï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä²ï¿½ï¿½ï¿½ï¿½ï¿½
+// ** Ö¸ï¿½ï¿½Òªï¿½ï¿½jsï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Éºï¿½ï¿½ï¿½ï¿½ï¿½Í·ï¿½
 inline emscripten::val send_array_fast_double(double *arr, int len) {
 	// std::cout << "fast f64 out arr: " << arr << " len: " << len << std::endl;
 	return emscripten::val(emscripten::typed_memory_view(len, arr));
