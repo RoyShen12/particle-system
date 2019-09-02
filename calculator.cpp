@@ -62,7 +62,7 @@ struct Particle {
 	};
 
 	inline double roche_limit_pow_2(Particle p_other) const {
-		// �������ϣ����: ((R1 + R2) * 2.423) * (density1 / density2) ^ (1/3)
+		// 洛希极限: ((R1 + R2) * 2.423) * (density1 / density2) ^ (1/3)
 		return (radius + p_other.radius) * (radius + p_other.radius) * 5.870929;
 	}
 
