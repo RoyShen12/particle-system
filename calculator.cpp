@@ -121,8 +121,7 @@ int main(int argc, char **argv) {
 	return 0;
 }
 
-// ������JS TypedArray�ķ�ʽ
-// ** unique_ptr����move
+// from JS TypedArray<Float64> -> std::unique_ptr -> std::move
 std::tuple<std::unique_ptr<double[]>, uint32_t> get_double_arr_from_js(emscripten::val arr) {
 	auto module = emscripten::val::global("Module");
 	const uint32_t _len = arr["length"].as<uint32_t>();
@@ -132,9 +131,7 @@ std::tuple<std::unique_ptr<double[]>, uint32_t> get_double_arr_from_js(emscripte
 	return std::make_tuple(std::move(data), _len);
 }
 
-// ���ĵ���������JS�ķ�ʽ
-// �������Ϊ��Ӧ��TypedArray����Ҫ��̬��������Ĳ�����
-// ** ָ��Ҫ��js������ɺ�����ͷ�
+// 使用 typed_memory_view 转移 double[] 的所有权
 inline emscripten::val send_array_fast_double(double *arr, int len) {
 	// std::cout << "fast f64 out arr: " << arr << " len: " << len << std::endl;
 	return emscripten::val(emscripten::typed_memory_view(len, arr));
