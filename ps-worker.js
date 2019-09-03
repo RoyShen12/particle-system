@@ -1,4 +1,5 @@
-importScripts('lodash.js', 'particle.js', 'calculator.js')
+// importScripts('https://cdn.jsdelivr.net/npm/lodash@4.17.11/lodash.min.js', 'particle.js', 'calculator.js')
+importScripts('calculator.js')
 
 onmessage = function (e) {
   // 来自转移所有权的字节消息
