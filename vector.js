@@ -16,7 +16,7 @@ class Vector2 {
   length() {
     return Math.sqrt(this.x * this.x + this.y * this.y)
   }
-  sqrLength() {
+  sqLength() {
     return this.x * this.x + this.y * this.y
   }
   normalize() {
