@@ -14,9 +14,9 @@
 #include <cmath>
 
 #include "emscripten.h"
-#include "val.h"
-#include "bind.h"
-#include "wire.h"
+#include "emscripten/val.h"
+#include "emscripten/bind.h"
+#include "emscripten/wire.h"
 
 constexpr double G = 6.67408e-3;
 
