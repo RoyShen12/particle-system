@@ -24,5 +24,5 @@ Visiting [emscripten official website | installation](https://emscripten.org/doc
 ## command
 c++17 flag is indispensable  
 ```
-$ ./em++ calculator.cpp -O3 -o calculator.js --bind -std=c++17
+$ em++ calculator.cpp -O3 -o calculator.js --bind -std=c++17
 ```

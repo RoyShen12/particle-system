@@ -61,7 +61,7 @@ struct Particle {
 		}
 	};
 
-	inline double roche_limit_pow_2(Particle p_other) const {
+	inline double roche_limit_pow_2(const Particle &p_other) const {
 		// 洛希极限: ((R1 + R2) * 2.423) * (density1 / density2) ^ (1/3)
 		return (radius + p_other.radius) * (radius + p_other.radius) * 5.870929;
 	}
@@ -87,14 +87,14 @@ struct Particle {
 
 template <typename It>
 inline std::vector<std::pair<It, It>> chunk(It range_from, It range_to, const std::ptrdiff_t num) {
-	/* Aliases, to make the rest of the code more readable. */
+	// Aliases, to make the rest of the code more readable.
 	using std::distance;
 	using std::make_pair;
 	using std::pair;
 	using std::vector;
 	using diff_t = std::ptrdiff_t;
 
-	/* Total item number and portion size. */
+	// Total item number and portion size.
 	const diff_t total { distance(range_from, range_to) };
 	const diff_t portion { total / num };
 
@@ -102,7 +102,7 @@ inline std::vector<std::pair<It, It>> chunk(It range_from, It range_to, const st
 
 	It portion_end{range_from};
 
-	/* Use the 'generate' algorithm to create portions. */
+	// Use the 'generate' algorithm to create portions.
 	std::generate(begin(chunks), end(chunks), [&portion_end, portion]() {
 		It portion_start { portion_end };
 
@@ -110,12 +110,17 @@ inline std::vector<std::pair<It, It>> chunk(It range_from, It range_to, const st
 		return make_pair(portion_start, portion_end);
 	});
 
-	/* The last portion's end must always be 'range_to'. */
+	// The last portion's end must always be 'range_to'.
 	chunks.back().second = range_to;
 
 	return chunks;
 }
 
+/**
+ *
+ * Main.
+ *
+ */
 int main(int argc, char **argv) {
 	printf("wasm ready.\n");
 	return 0;
@@ -136,7 +141,7 @@ inline emscripten::val send_array_fast_double(double *arr, int len) {
 	// std::cout << "fast f64 out arr: " << arr << " len: " << len << std::endl;
 	return emscripten::val(emscripten::typed_memory_view(len, arr));
 }
-inline emscripten::val send_array_fast_uint32(uint32_t *arr, int len) {
+inline emscripten::val send_array_fast_uint32(const uint32_t *arr, int len) {
 	return emscripten::val(emscripten::typed_memory_view(len, arr));
 }
 
